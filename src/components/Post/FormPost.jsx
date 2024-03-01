@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaUpload } from "react-icons/fa";
 
-function FormPost() {
+function FormPost({ groupId }) {
   const [isLogin, setIsLogin] = useState(false);
   const [userName, setUserName] = useState(null);
   const [profileData, setProfileData] = useState(null);
+  const [imagePreviewPost, setImagePreviewPost] = useState(null);
   const [imagePost, setImagePost] = useState(null);
+  const [content, setContent] = useState("");
 
   useEffect(() => {
     const storedData = localStorage.getItem("IuDiToken");
@@ -34,12 +36,40 @@ function FormPost() {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+    setImagePost(file);
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePost(reader.result);
+        setImagePreviewPost(reader.result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAddPost = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("image", imagePost);
+      const responseImgbb = await axios.post(
+        "https://api.imgbb.com/1/upload?key=58cc04b46a61758b8f45a2d7977af518",
+        formData
+      );
+
+      const response = await axios.post(
+        `https://api.iudi.xyz/api/forum/add_comment/${profileData?.Users[0].UserID}/${groupId}`,
+        {
+          Content: content,
+          PhotoURL: [responseImgbb.data.data.url],
+        }
+      );
+
+      if (response.data.status == 200) {
+        setContent("");
+        setImagePost(null);
+        setImagePreviewPost(null);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -55,6 +85,8 @@ function FormPost() {
                 className="w-10 h-10 rounded-full mr-2"
               />
               <input
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
                 type="text"
                 placeholder="Bạn đang nghĩ gì ?"
                 className="border border-gray-300 px-4 py-2 rounded-md flex-grow mr-2 focus:outline-none"
@@ -74,18 +106,19 @@ function FormPost() {
               <button
                 style={{ marginLeft: "10px" }}
                 className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 mr-1"
+                onClick={handleAddPost}
               >
                 Đăng bài
               </button>
             </div>
-            {imagePost && (
+            {imagePreviewPost && (
               <div className="flex justify-center">
                 <img
-                  src={imagePost}
+                  src={imagePreviewPost}
                   alt="Preview"
                   className="max-w-xs mt-2 cursor-pointer"
                   onClick={() => {
-                    setImagePost(null);
+                    setImagePreviewPost(null);
                   }}
                 />
               </div>

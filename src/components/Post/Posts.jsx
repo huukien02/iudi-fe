@@ -8,37 +8,56 @@ import axios from "axios";
 import FormPost from "./FormPost";
 import { Tooltip } from "@material-tailwind/react";
 
-const posts = [
-  {
-    avatar:
-      "https://sm.ign.com/ign_nordic/cover/a/avatar-gen/avatar-generations_prsz.jpg",
-    username: "huukien02",
-    time: "19/5/2024 6:50 am",
-    status: "Hello",
-    image:
-      "https://thanhnien.mediacdn.vn/Uploaded/dotuan/2022_09_23/2-2190.jpg",
-  },
-  {
-    avatar:
-      "https://sm.ign.com/ign_nordic/cover/a/avatar-gen/avatar-generations_prsz.jpg",
-    username: "huukien02",
-    time: "20/5/2022 18:10 pm",
-    status: "Hello body",
-    image:
-      "https://thanhnien.mediacdn.vn/Uploaded/dotuan/2022_09_23/2-2190.jpg",
-  },
-  {
-    avatar:
-      "https://sm.ign.com/ign_nordic/cover/a/avatar-gen/avatar-generations_prsz.jpg",
-    username: "huukien02",
-    time: "1/5/2023 16 pm",
-    status: "Hi Guy",
-    image:
-      "https://thanhnien.mediacdn.vn/Uploaded/dotuan/2022_09_23/2-2190.jpg",
-  },
-];
+// const posts = [
+//   {
+//     avatar:
+//       "https://sm.ign.com/ign_nordic/cover/a/avatar-gen/avatar-generations_prsz.jpg",
+//     username: "huukien02",
+//     time: "19/5/2024 6:50 am",
+//     status: "Hello",
+//     image:
+//       "https://thanhnien.mediacdn.vn/Uploaded/dotuan/2022_09_23/2-2190.jpg",
+//   },
+//   {
+//     avatar:
+//       "https://sm.ign.com/ign_nordic/cover/a/avatar-gen/avatar-generations_prsz.jpg",
+//     username: "huukien02",
+//     time: "20/5/2022 18:10 pm",
+//     status: "Hello body",
+//     image:
+//       "https://thanhnien.mediacdn.vn/Uploaded/dotuan/2022_09_23/2-2190.jpg",
+//   },
+//   {
+//     avatar:
+//       "https://sm.ign.com/ign_nordic/cover/a/avatar-gen/avatar-generations_prsz.jpg",
+//     username: "huukien02",
+//     time: "1/5/2023 16 pm",
+//     status: "Hi Guy",
+//     image:
+//       "https://thanhnien.mediacdn.vn/Uploaded/dotuan/2022_09_23/2-2190.jpg",
+//   },
+// ];
+
 function Posts() {
   const [groups, setGroups] = useState([]);
+  const [posts, setPost] = useState([]);
+  const [activeGroupId, setActiveGroupId] = useState(0);
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.iudi.xyz/api/forum/group/${activeGroupId}/1/1`
+        );
+        console.log(response);
+        setPost(response.data.list_posts);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchGroups();
+  }, [activeGroupId]);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -54,8 +73,6 @@ function Posts() {
 
     fetchGroups();
   }, []);
-
-  console.log(groups);
 
   // pagination
   const [active, setActive] = useState(1);
@@ -99,13 +116,16 @@ function Posts() {
                   src={group?.avatarLink}
                   alt={group?.GroupName}
                   className="w-16 h-16 rounded-full mx-auto mb-2"
+                  onClick={() => {
+                    setActiveGroupId(group?.GroupID);
+                  }}
                 />
               </div>
             </Tooltip>
           ))}
         </div>
       </div>
-      <FormPost />
+      <FormPost groupId={activeGroupId} />
       <PostUser listPost={posts} />
       <div className="bd-white flex justify-center pb-5">
         <div className="flex items-center gap-4">
