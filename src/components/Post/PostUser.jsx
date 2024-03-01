@@ -1,10 +1,7 @@
 import React from "react";
-import FormPost from "./FormPost";
+import { fomatTime } from "../../utils/fomatTime";
 
 const PostUser = ({ listPost }) => {
-  const fomatTime = (time) => {
-    console.log(time);
-  };
   return (
     <div className="flex justify-center items-center mt-5">
       <div className="max-w-lg w-full">
@@ -20,7 +17,9 @@ const PostUser = ({ listPost }) => {
                 {item?.Username}
               </span>
             </div>
-            <div className="text-gray-600 text-sm mb-2">{item?.PostTime}</div>
+            <div className="text-gray-600 text-sm mb-2">
+              {fomatTime(item?.PostTime)}
+            </div>
             <div className="mb-2">{item?.Title}</div>
             <div className="mb-2">{item?.Content}</div>
             <img
@@ -41,10 +40,10 @@ const PostUser = ({ listPost }) => {
                     />
                     <div>
                       <span className="text-gray-800 font-medium">
-                        {item?.FirstComment?.Username}
-                      </span>
-                      <span className="text-xs text-gray-500 ml-1">
-                        {fomatTime(item?.FirstComment?.Time)}
+                        <strong> {item?.FirstComment?.Username}</strong>
+                        <span className="text-xs text-gray-500 ml-1">
+                          {fomatTime(item?.FirstComment?.Time)}
+                        </span>
                       </span>
                     </div>
                   </div>
